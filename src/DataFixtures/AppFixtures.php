@@ -10,11 +10,13 @@ class AppFixtures extends Fixture
 {
     public function load(ObjectManager $manager): void
     {
-        foreach ($userlist = [
+        $userList = [
             ['name' => 'Vincent', 'matos' => 'PC', 'haircolor' => 'Brun'],
             ['name' => 'Audrey', 'matos' => 'Mac', 'haircolor' => 'Noir'],
             ['name' => 'Antony', 'matos' => 'Mac', 'haircolor' => 'Brun']
-        ] as $value) {
+        ];
+
+        foreach ($userList as $value) {
             $user = new User();
             $user->setName($value['name']);
             $user->setMatos($value['matos']);
