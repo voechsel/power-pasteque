@@ -31,4 +31,11 @@ class HomeController extends AbstractController
 
         return new Response(($this->serialize->serialize($users, 'json')));
     }
+
+    #[Route('/home/id/{slug}', name: 'app_user_id')]
+    public function showUserById($slug): Response {
+        $users = $this->userService->findById($slug);
+
+        return new Response(($this->serialize->serialize($users, 'json')));
+    }
 }

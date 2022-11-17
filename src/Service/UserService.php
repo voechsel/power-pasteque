@@ -2,6 +2,7 @@
 
 namespace App\Service;
 
+use App\Entity\User;
 use App\Repository\UserRepository;
 
 class UserService
@@ -17,5 +18,9 @@ class UserService
 
     public function findByName($name): array {
         return $this->userRepository->findBy(array('name' => $name));
+    }
+
+    public function findById($id): User {
+        return $this->userRepository->findOneBy(array('id' => $id));
     }
 }
