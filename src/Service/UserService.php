@@ -14,4 +14,8 @@ class UserService
     public function findAllUsers(): array {
         return $this->userRepository->findAll();
     }
+
+    public function findByName($name): array {
+        return $this->userRepository->findBy(array('name' => $name));
+    }
 }

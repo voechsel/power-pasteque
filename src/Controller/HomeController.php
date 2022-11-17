@@ -19,10 +19,16 @@ class HomeController extends AbstractController
     }
 
     #[Route('/home', name: 'app_home')]
-    public function show(): Response
-    {
+    public function show(): Response {
         $users = $this->userService->findAllUsers();
 
         return new Response($this->serialize->serialize($users, 'json'));
+    }
+
+    #[Route('/home/{slug}', name: 'app_user_detail')]
+    public function showUser($slug): Response {
+        $users = $this->userService->findByName($slug);
+
+        return new Response(($this->serialize->serialize($users, 'json')));
     }
 }
