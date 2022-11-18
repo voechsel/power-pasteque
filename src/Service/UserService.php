@@ -23,4 +23,9 @@ class UserService
     public function findById($id): User {
         return $this->userRepository->findOneBy(array('id' => $id));
     }
+
+    public function createUser()
+    {
+
+    }
 }
