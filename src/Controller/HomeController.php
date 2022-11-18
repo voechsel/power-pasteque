@@ -32,17 +32,29 @@ class HomeController extends AbstractController
     #[Route('/home/add/', name: 'app_user_add')]
     public function addUser(ManagerRegistry $doctrine, Request $request): Response {
         $entityManager = $doctrine->getManager();
-        $post_data = json_decode($request->getContent(), true);
+        $data = json_decode($request->getContent(), true);
 
         $user = new User();
-        $user->setName($post_data['name']);
-        $user->setMatos($post_data['matos']);
-        $user->setHaircolor($post_data['haircolor']);
+        $user->setName($data['name']);
+        $user->setMatos($data['matos']);
+        $user->setHaircolor($data['haircolor']);
 
         $entityManager->persist($user);
         $entityManager->flush();
 
         return new Response(($this->serialize->serialize($user, 'json')));
+    }
+
+    #[Route('/home/delete/{id}', name: 'app_user_delete')]
+    public function deleteUser(ManagerRegistry $doctrine, Request $request, $id): Response {
+        $entityManager = $doctrine->getManager();
+
+        $user = $this->userService->findById($id);
+
+        $entityManager->remove($user);
+        $entityManager->flush();
+
+        return new Response('This user has been successfully deleted');
     }
 
     #[Route('/home/{name}', name: 'app_user_detail')]
@@ -60,13 +72,17 @@ class HomeController extends AbstractController
     }
 
     #[Route('/home/edit/{id}', name: 'app_user_edit')]
-    public function updateUser(ManagerRegistry $doctrine, $id): Response {
+    public function updateUser(ManagerRegistry $doctrine, Request $request, $id): Response {
         $entityManager = $doctrine->getManager();
+        $data = json_decode($request->getContent(), true);
+
         $user = $this->userService->findById($id);
-        $user->setName('Vincent');
+        $user->setName($data['name']);
+        $user->setMatos($data['matos']);
+        $user->setHaircolor($data['haircolor']);
+
         $entityManager->flush();
 
         return new Response(($this->serialize->serialize($user, 'json')));
     }
-
 }
