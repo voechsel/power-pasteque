@@ -8,6 +8,7 @@ use App\Service\UserService;
 use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\Serializer\Exception\ExceptionInterface;
 use Symfony\Component\Serializer\Serializer;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
@@ -39,10 +40,14 @@ class HomeController extends AbstractController
         $user->setMatos($data['matos']);
         $user->setHaircolor($data['haircolor']);
 
-        $entityManager->persist($user);
-        $entityManager->flush();
+        if ($this->userService->findByName($data['name'])) {
+            return new Response('This name is already taken');
+        } else {
+            $entityManager->persist($user);
+            $entityManager->flush();
 
-        return new Response(($this->serialize->serialize($user, 'json')));
+            return new Response(($this->serialize->serialize($user, 'json')));
+        }
     }
 
     #[Route('/home/delete/{id}', name: 'app_user_delete')]
@@ -77,12 +82,25 @@ class HomeController extends AbstractController
         $data = json_decode($request->getContent(), true);
 
         $user = $this->userService->findById($id);
-        $user->setName($data['name']);
-        $user->setMatos($data['matos']);
-        $user->setHaircolor($data['haircolor']);
+        $user_data = $this->serialize->normalize($user, null);
+
+        if (!$data['name']) {
+            $user->setName($user_data['name']);
+        } else {
+            $user->setName($data['name']);
+        }
+        if (!$data['matos']) {
+            $user->setMatos($user_data['matos']);
+        } else {
+            $user->setMatos($data['matos']);
+        }
+        if (!$data['haircolor']) {
+            $user->setHaircolor($user_data['haircolor']);
+        } else {
+            $user->setHaircolor($data['haircolor']);
+        }
 
         $entityManager->flush();
-
         return new Response(($this->serialize->serialize($user, 'json')));
     }
 }
