@@ -59,7 +59,7 @@ class HomeController extends AbstractController
         $entityManager->remove($user);
         $entityManager->flush();
 
-        return new Response('This user has been successfully deleted');
+        return new Response();
     }
 
     #[Route('/home/{name}', name: 'app_user_detail')]
@@ -76,27 +76,33 @@ class HomeController extends AbstractController
         return new Response(($this->serialize->serialize($user, 'json')));
     }
 
+    #[Route('/home/clone/{id}', name: 'app_user_clone')]
+    public function cloneUser(ManagerRegistry $doctrine, $id): Response {
+        $entityManager = $doctrine->getManager();
+        $user = $this->userService->findById($id);
+        $user_clone = clone $user;
+        $user_clone->setName($user_clone->getName().' (cloned)');
+
+        $entityManager->persist($user_clone);
+        $entityManager->flush();
+        return new Response($this->serialize->serialize($user_clone, 'json'));
+    }
+
     #[Route('/home/edit/{id}', name: 'app_user_edit')]
     public function updateUser(ManagerRegistry $doctrine, Request $request, $id): Response {
         $entityManager = $doctrine->getManager();
         $data = json_decode($request->getContent(), true);
-
         $user = $this->userService->findById($id);
-        $user_data = $this->serialize->normalize($user, null);
 
-        if (!$data['name']) {
-            $user->setName($user_data['name']);
-        } else {
+        if (isset($data['name'])) {
             $user->setName($data['name']);
         }
-        if (!$data['matos']) {
-            $user->setMatos($user_data['matos']);
-        } else {
+
+        if (isset($data['matos'])) {
             $user->setMatos($data['matos']);
         }
-        if (!$data['haircolor']) {
-            $user->setHaircolor($user_data['haircolor']);
-        } else {
+
+        if (isset($data['haircolor'])) {
             $user->setHaircolor($data['haircolor']);
         }
 
